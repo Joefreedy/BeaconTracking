@@ -11,6 +11,10 @@ The Design Idea
   This will contain, rssi, transmission power, minor, major, and perhaps mac info.
 2 The server receives the data, and using web socket updates the display of all the currently connected web browsers.
 
+Currently positional data is sent from the beacon using a simple http get request.
+
+http://????:8125/?detector=4&uuid=3&major=42&minor=11&power=255&rssi=255
+
 Uses nodejs
 -----------
 
