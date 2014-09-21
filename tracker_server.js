@@ -7,13 +7,30 @@ var io = require('socket.io');
 var sys = require ('sys');
 var url = require('url');
 var qs = require('querystring');
+var fs = require('fs');
+
 /**
 * Detector - Ibeacon receivers
 */
-var detectors = {};			// Detector info, position, changed etc... 
-var detector_state = {};		// Detector state, current staff
-var detected_staff = {};		// Currently detected staff
-var detected_staff_timeout = {};	// Staff detection timeout
+var detectors = {};                     // Detector info, position, changed etc...
+var detector_state = {};                // Detector state, current staff
+var detected_staff = {};                // Currently detected staff
+var detected_staff_timeout = {};        // Staff detection timeout
+var detectors_file = "detectors.json";  // Location of detectors
+fs.readFile(detectors_file, 'utf8', function (err, data)
+	{
+		if (err) {
+			console.log('Error: ' + err);
+			return;
+		}
+		detector_info = JSON.parse(data);
+		// Now load detector info
+		for (var key in detector_info) {
+   			var obj = detector_info[key];
+			add_detector(key, obj.x, obj.y, obj.width, obj.height, obj.location); 
+		}
+	}
+)
 
 /**
 * My method description.  Like other pieces of your comment blocks, 
@@ -26,13 +43,14 @@ var detected_staff_timeout = {};	// Staff detection timeout
 * @param {int}    width  Width of area covered by receiver/detector
 * @param {int}    height Height of area covered by receiver/detector
 */
-function add_detector( name, x, y, width, height)
+function add_detector( name, x, y, width, height, location)
 {
         detector = new Object;
         detector.x=x;			// Map position
         detector.y=y;
 	detector.width=width;
 	detector.height=height;
+	detector.loction=location;
 
         detector.name=name;		// Name
 	detector.changed=0; 		// State changed - Only send updated data to browsers
@@ -41,15 +59,6 @@ function add_detector( name, x, y, width, height)
 	var staff = {};			// Currently detected staff
 	detector_state[name]=staff;
 }
-
-/**
-* List of detector/receivers
-* Will move into a configuration file, perhaps json/database
-*/
-add_detector(1, 382, 315, 125, 100);
-add_detector(2, 507, 315, 125, 100);
-add_detector(3, 382, 215, 125, 100);
-add_detector(4, 507, 215, 125, 100);
 
 // Http Listener 
 var http_listener;
