@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Tracker Application</title>
+        <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script type="text/javascript">
+	    var canvas = null;
+            var context = null;
+	    var socket = null;
+	    var sensors = {};
+            function on_load()
+            {
+		canvas = document.getElementById('canvas');
+		context = canvas.getContext('2d');
+		socket = io.connect("/");
+            	/*Initializing the connection with the server via websockets */
+            	socket.on("message",function(message) {
+                	parsed_message = JSON.parse(message);
+			if (parsed_message.type=='map') 
+			{
+				// Draw map
+				draw_map(parsed_message);
+			}
+			else if (parsed_message.type=='track')
+			{
+				var id         = parsed_message.id;
+				var x          = parsed_message.x;
+				var y          = parsed_message.y;
+				var width      = parsed_message.width;
+				var height     = parsed_message.height;
+				var staff_list = parsed_message.list;
+				console.log(staff_list);
+			}
+            	});
+	    }
+
+	    function draw_wall(data)
+	    {
+		console.log(data)
+		context.beginPath();
+		context.moveTo(data.x, data.y);
+                context.lineTo(data.length*Math.cos(3.142*data.angle/180)+data.x, data.length*Math.sin(3.142*data.angle/180)+data.y);
+                context.stroke();
+	    }
+
+	    function draw_item(data)
+	    {
+		if (data.type=='wall')
+		{
+			draw_wall(data)
+		} else if (data.type=='door')
+		{
+		} else if (data.type=='window')
+		{
+		} else if (data.type=='screen')
+		{
+		}
+	    }
+
+	    function draw_map(data) 
+  	    {
+		console.log(data.floor1);
+		for(var i=0; i<data.floor1.length; i++)
+		{
+			draw_item(data.floor1[i]);
+		}
+      	    }
+
+	    function on_unload()
+	    {
+		console.log("Disconnect");
+		if (socket != null) socket.disconnect();
+	    }
+
+        </script>
+    </head>
+    <body onload="on_load()" onunload="on_unload()">
+	 <h1 style="color:blue;text-align:center;">
+		Tracking Application
+	 </h1>
+	 <canvas id="canvas" width="600" height="600" position="center"></canvas>
+    </body>
+</html>

@@ -9,6 +9,22 @@ var url = require('url');
 var qs = require('querystring');
 var fs = require('fs');
 
+
+/**
+* Room maps
+*/
+var room_json = {};
+var room_json_file = "room_layout/room_layout.json";  // Location of detectors
+fs.readFile(room_json_file, 'utf8', function (err, data)
+        {
+                if (err) {
+                        console.log('Error: ' + err);
+                        return;
+                }
+                room_json = JSON.parse(data);
+        }
+)
+
 /**
 * Detector - Ibeacon receivers
 */
@@ -16,7 +32,7 @@ var detectors = {};                     // Detector info, position, changed etc.
 var detector_state = {};                // Detector state, current staff
 var detected_staff = {};                // Currently detected staff
 var detected_staff_timeout = {};        // Staff detection timeout
-var detectors_file = "detectors.json";  // Location of detectors
+var detectors_file = "beacon_locations/detectors.json";  // Location of detectors
 fs.readFile(detectors_file, 'utf8', function (err, data)
 	{
 		if (err) {
@@ -62,9 +78,6 @@ function add_detector( name, x, y, width, height, location)
 
 // Http Listener 
 var http_listener;
-
-// Client Socket
-var client_socket=null;
 
 /**
 * Used to time out staff members. If a signal is not detected after a certain amount of time, it is assumed they are no longer there.
@@ -223,6 +236,7 @@ function update_web(detector)
 		list.push(item.major);
         }
 	full_info.list=list;	
+	full_info.type="track";
 	http_listener.sockets.emit('message', JSON.stringify(full_info));
 }
 
@@ -252,12 +266,16 @@ app.use(express.static('./public'));
 var http_server = http.createServer(app).listen(8124); //Server listens on the port 8124
 http_listener = io.listen(http_server);
  
-http_listener.sockets.on("connection",function(socket){
-    client_socket=socket;
-    console.log('Socket.io Connection with the client established');
-    socket.on('disconnect', function () {
-        console.log("Disconnect");
-    });
+http_listener.sockets.on("connection", function(socket) {
+    	console.log('Socket.io Connection with the client established');
+    	socket.on('disconnect', function () {
+        	console.log("Disconnect");
+    	});
+	// Send Room Data To Web Page
+	console.log('Connected');
+	room_json.type="map";
+	//http_listener.sockets.emit('message', JSON.stringify(room_json));
+	socket.emit('message', JSON.stringify(room_json));
 });
 
 /**
@@ -268,4 +286,5 @@ data_server.listen( 8125 );
 * Timeout timer
 */
 setInterval(timeout, 1000);
+
 
