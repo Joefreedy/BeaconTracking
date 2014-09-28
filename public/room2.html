@@ -35,28 +35,97 @@
             	});
 	    }
 
-	    function draw_wall(data)
+	    function draw_wall(context, data)
 	    {
-		console.log(data)
 		context.beginPath();
+		context.lineWidth=5;
 		context.moveTo(data.x, data.y);
                 context.lineTo(data.length*Math.cos(3.142*data.angle/180)+data.x, data.length*Math.sin(3.142*data.angle/180)+data.y);
                 context.stroke();
 	    }
 
+	    function draw_screen(context, data)
+            {
+                context.beginPath();
+                context.lineWidth=2;
+                context.moveTo(data.x, data.y);
+                context.lineTo(data.length*Math.cos(3.142*data.angle/180)+data.x, data.length*Math.sin(3.142*data.angle/180)+data.y);
+                context.stroke();
+            }
+
+	    function draw_window(context, data)
+	    {
+                context.beginPath();
+                context.lineWidth=2;
+                context.moveTo(data.x, data.y);
+                context.lineTo(data.length*Math.cos(3.142*data.angle/180)+data.x, data.length*Math.sin(3.142*data.angle/180)+data.y);
+                context.stroke();
+		// Window
+		x1 = 4*Math.cos(3.142*(90+data.angle)/180)+data.x;
+		y1 = 4*Math.sin(3.142*(90+data.angle)/180)+data.y
+		x2 = x1 + data.length*Math.cos(3.142*data.angle/180);
+		y2 = y1 + data.length*Math.sin(3.142*data.angle/180);
+		x3 = x2 - 4*Math.cos(3.142*(90+data.angle)/180);
+		y3 = y2 - 4*Math.sin(3.142*(90+data.angle)/180);
+		context.beginPath();
+                context.lineWidth=1;
+		context.moveTo(data.x, data.y);
+		context.lineTo(x1, y1);
+		context.lineTo(x2, y2);
+		context.lineTo(x3, y3);
+		context.stroke();
+            }
+
+	    function draw_door(context, data)
+            {
+		angle=data.angle;
+		context.beginPath();
+		context.moveTo(data.x, data.y);
+                context.lineWidth=5;
+                context.lineTo(data.length*Math.cos(3.142*angle/180)+data.x, data.length*Math.sin(3.142*angle/180)+data.y);
+		context.stroke();
+		context.beginPath();
+		context.lineWidth=2;
+		context.moveTo(data.x, data.y);
+		angle1 = angle+30;
+		context.lineTo(data.length*Math.cos(3.142*angle1/180)+data.x, data.length*Math.sin(3.142*angle1/180)+data.y)
+                context.stroke();
+		// Arc
+		context.beginPath();
+		context.lineWidth=1;
+		context.arc(data.x, data.y, data.length, 3.142*angle/180, 3.142*angle1/180, false);
+		context.stroke();
+            }
+
+	    function draw_table(context, data)
+	    {
+		context.beginPath();
+                context.lineWidth=1;
+		context.arc(data.x, data.y, data.length, 0, 3.142*2, false);
+                context.stroke();
+	    }
+
 	    function draw_item(data)
 	    {
+		console.log(data);
 		if (data.type=='wall')
 		{
-			draw_wall(data)
+			draw_wall(context, data)
 		} else if (data.type=='door')
 		{
+			draw_door(context, data);
 		} else if (data.type=='window')
 		{
+			draw_window(context, data);
 		} else if (data.type=='screen')
 		{
+			draw_screen(context, data)
+		}  else if (data.type=='table')
+		{
+			draw_table(context, data);
 		}
 	    }
+
 
 	    function draw_map(data) 
   	    {

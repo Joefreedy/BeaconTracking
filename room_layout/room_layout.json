@@ -10,24 +10,61 @@
 		},
 		{
                                 "type":"wall",
-                                "x":100,
-                                "y":100,
-                                "length":100,
-                                "angle":-90
+                                "x":0,
+                                "y":0,
+                                "length":200,
+                                "angle":90
                 },
 		{
-                                "type":"wall",
+                                "type":"window",
                                 "x":100,
-                                "y":100,
-                                "length":-100,
+                                "y":0,
+                                "length":100,
+                                "angle":0
+                }
+		,
+                {
+                                "type":"wall",
+                                "x":200,
+                                "y":0,
+                                "length":100,
+                                "angle":0
+                },
+		{
+                                "type":"door",
+                                "x":300,
+                                "y":0,
+                                "length":100,
                                 "angle":0
                 },
 		{
                                 "type":"wall",
-                                "x":0,
+                                "x":400,
                                 "y":0,
                                 "length":100,
+                                "angle":0
+                },
+		{
+                                "type":"wall",
+                                "x":500,
+                                "y":0,
+                                "length":200,
                                 "angle":90
+                },
+		{
+                                "type":"wall",
+                                "x":500,
+                                "y":200,
+                                "length":500,
+                                "angle":180
+                },
+		{
+                                "type":"table",
+				"shape":"round",
+                                "x":100,
+                                "y":100,
+                                "length": 25
                 }
+
 	]
 }
