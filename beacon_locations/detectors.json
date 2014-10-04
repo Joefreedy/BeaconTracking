@@ -1,0 +1,18 @@
+{
+  "1":
+	{
+		"x":182,
+		"y":115,
+		"width":50,
+		"height":50,
+  		"location":"Canteen"
+	},
+  "2":
+	{
+		"x":307,
+		"y":315,
+		"width":50,
+		"height":50,
+		"location":"Meeting Room A"
+	}
+}

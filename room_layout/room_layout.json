@@ -61,10 +61,23 @@
 		{
                                 "type":"table",
 				"shape":"round",
+                                "x":160,
+                                "y":140,
+                                "length": 100
+                },
+		{
+                                "type":"table",
+                                "shape":"square",
+                                "x":400,
+                                "y":150,
+                                "length": 100 
+                },
+                {
+                                "type":"chair",
+                                "shape":"round",
                                 "x":100,
-                                "y":100,
-                                "length": 25
+                                "y":70,
+                                "length": 50
                 }
-
 	]
 }
