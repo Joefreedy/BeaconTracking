@@ -2,17 +2,28 @@
 <html lang="en">
     <head>
         <title>Tracker Application</title>
+	<script type="text/javascript" src="room_layout.js"></script>
+	<script type="text/javascript" src="staff_draw.js"></script>
         <script type="text/javascript" src="/socket.io/socket.io.js"></script>
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 	<script type="text/javascript">
-	    var canvas = null;
-            var context = null;
+	    var canvas_map     = null;
+	    var canvas_beacons = null;
+	    var canvas_staff   = null;
+            var context_map    = null;
+	    var context_beacons= null;
+	    var context_staff  = null;
 	    var socket = null;
-	    var sensors = {};
+	    var sensors = {}; // Sensor Info
             function on_load()
             {
-		canvas = document.getElementById('canvas');
-		context = canvas.getContext('2d');
+		// Setup canvases for multiple layers
+		canvas_map  = document.getElementById('canvas_map');
+		context_map = canvas_map.getContext('2d');
+		canvas_beacons  = document.getElementById('canvas_beacons');
+                context_beacons = canvas_beacons.getContext('2d');
+		canvas_staff  = document.getElementById('canvas_staff');
+                context_staff = canvas_staff.getContext('2d');
 		socket = io.connect("/");
             	/*Initializing the connection with the server via websockets */
             	socket.on("message",function(message) {
@@ -20,7 +31,7 @@
 			if (parsed_message.type=='map') 
 			{
 				// Draw map
-				draw_map(parsed_message);
+				draw_map(context_map, parsed_message);
 			}
 			else if (parsed_message.type=='track')
 			{
@@ -30,111 +41,10 @@
 				var width      = parsed_message.width;
 				var height     = parsed_message.height;
 				var staff_list = parsed_message.list;
-				console.log(staff_list);
+				draw_staff(context_staff, x, y, width, height, staff_list)  
 			}
             	});
 	    }
-
-	    function draw_wall(context, data)
-	    {
-		context.beginPath();
-		context.lineWidth=5;
-		context.moveTo(data.x, data.y);
-                context.lineTo(data.length*Math.cos(3.142*data.angle/180)+data.x, data.length*Math.sin(3.142*data.angle/180)+data.y);
-                context.stroke();
-	    }
-
-	    function draw_screen(context, data)
-            {
-                context.beginPath();
-                context.lineWidth=2;
-                context.moveTo(data.x, data.y);
-                context.lineTo(data.length*Math.cos(3.142*data.angle/180)+data.x, data.length*Math.sin(3.142*data.angle/180)+data.y);
-                context.stroke();
-            }
-
-	    function draw_window(context, data)
-	    {
-                context.beginPath();
-                context.lineWidth=2;
-                context.moveTo(data.x, data.y);
-                context.lineTo(data.length*Math.cos(3.142*data.angle/180)+data.x, data.length*Math.sin(3.142*data.angle/180)+data.y);
-                context.stroke();
-		// Window
-		x1 = 4*Math.cos(3.142*(90+data.angle)/180)+data.x;
-		y1 = 4*Math.sin(3.142*(90+data.angle)/180)+data.y
-		x2 = x1 + data.length*Math.cos(3.142*data.angle/180);
-		y2 = y1 + data.length*Math.sin(3.142*data.angle/180);
-		x3 = x2 - 4*Math.cos(3.142*(90+data.angle)/180);
-		y3 = y2 - 4*Math.sin(3.142*(90+data.angle)/180);
-		context.beginPath();
-                context.lineWidth=1;
-		context.moveTo(data.x, data.y);
-		context.lineTo(x1, y1);
-		context.lineTo(x2, y2);
-		context.lineTo(x3, y3);
-		context.stroke();
-            }
-
-	    function draw_door(context, data)
-            {
-		angle=data.angle;
-		context.beginPath();
-		context.moveTo(data.x, data.y);
-                context.lineWidth=5;
-                context.lineTo(data.length*Math.cos(3.142*angle/180)+data.x, data.length*Math.sin(3.142*angle/180)+data.y);
-		context.stroke();
-		context.beginPath();
-		context.lineWidth=2;
-		context.moveTo(data.x, data.y);
-		angle1 = angle+30;
-		context.lineTo(data.length*Math.cos(3.142*angle1/180)+data.x, data.length*Math.sin(3.142*angle1/180)+data.y)
-                context.stroke();
-		// Arc
-		context.beginPath();
-		context.lineWidth=1;
-		context.arc(data.x, data.y, data.length, 3.142*angle/180, 3.142*angle1/180, false);
-		context.stroke();
-            }
-
-	    function draw_table(context, data)
-	    {
-		context.beginPath();
-                context.lineWidth=1;
-		context.arc(data.x, data.y, data.length, 0, 3.142*2, false);
-                context.stroke();
-	    }
-
-	    function draw_item(data)
-	    {
-		console.log(data);
-		if (data.type=='wall')
-		{
-			draw_wall(context, data)
-		} else if (data.type=='door')
-		{
-			draw_door(context, data);
-		} else if (data.type=='window')
-		{
-			draw_window(context, data);
-		} else if (data.type=='screen')
-		{
-			draw_screen(context, data)
-		}  else if (data.type=='table')
-		{
-			draw_table(context, data);
-		}
-	    }
-
-
-	    function draw_map(data) 
-  	    {
-		console.log(data.floor1);
-		for(var i=0; i<data.floor1.length; i++)
-		{
-			draw_item(data.floor1[i]);
-		}
-      	    }
 
 	    function on_unload()
 	    {
@@ -148,6 +58,8 @@
 	 <h1 style="color:blue;text-align:center;">
 		Tracking Application
 	 </h1>
-	 <canvas id="canvas" width="600" height="600" position="center"></canvas>
+	 <canvas id="canvas_map"     width="640" height="480" style="position: absolute; z-index: 0"></canvas>
+	 <canvas id="canvas_beacons" width="640" height="480" style="position: absolute; z-index: 1"></canvas>
+	 <canvas id="canvas_staff" width="640" height="480" style="position: absolute; z-index: 2"></canvas>
     </body>
 </html>
