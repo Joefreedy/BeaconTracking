@@ -3,16 +3,16 @@
 	{
 		"x":182,
 		"y":115,
-		"width":50,
-		"height":50,
+		"width":25,
+		"height":25,
   		"location":"Canteen"
 	},
   "2":
 	{
-		"x":307,
-		"y":315,
-		"width":50,
-		"height":50,
+		"x":257,
+		"y":115,
+		"width":25,
+		"height":25,
 		"location":"Meeting Room A"
 	}
 }

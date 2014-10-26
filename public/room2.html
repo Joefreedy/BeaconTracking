@@ -28,6 +28,7 @@
             	/*Initializing the connection with the server via websockets */
             	socket.on("message",function(message) {
                 	parsed_message = JSON.parse(message);
+			console.log(parsed_message);
 			if (parsed_message.type=='map') 
 			{
 				// Draw map
@@ -35,13 +36,7 @@
 			}
 			else if (parsed_message.type=='track')
 			{
-				var id         = parsed_message.id;
-				var x          = parsed_message.x;
-				var y          = parsed_message.y;
-				var width      = parsed_message.width;
-				var height     = parsed_message.height;
-				var staff_list = parsed_message.list;
-				draw_staff(context_staff, x, y, width, height, staff_list)  
+				staff_draw_staff(context_staff, parsed_message);
 			}
             	});
 	    }

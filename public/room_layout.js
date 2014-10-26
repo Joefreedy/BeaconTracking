@@ -152,8 +152,54 @@ function draw_item(context, data)
         } else if (data.type=='chair')
         {
                 draw_chair(context, data);
+        }  else if (data.type=='staff')
+        {
+                draw_human(context, data);
+        } else if (data.type=='beacon')
+        {
+                draw_beacon(context, data);
         }
 }
+
+function draw_beacon(context, data)
+{
+	context.beginPath();
+        context.lineWidth=1;
+        length=data.length;
+	context.arc(data.x, data.y, length/2, 0, 3.142*2, false)
+	context.arc(data.x, data.y, length/4, 0, 3.142*2, false)
+        context.stroke();
+}
+
+
+function draw_human(context, data)
+{
+	context.beginPath();
+        context.lineWidth=1;
+        length=data.length;
+	width=data.length/4;
+	length_seg=(length-width)/3;
+	// Head
+	context.arc(data.x+width/2, data.y+width/2, width/2, 0, 3.142*2, false);
+	// Neck
+	context.moveTo(data.x+width/2, data.y+width);
+        context.lineTo(data.x+width/2, data.y+width+length_seg );
+	// Body 
+        context.moveTo(data.x+width/2, data.y+width);
+        context.lineTo(data.x+width/2, data.y+width+length_seg*2);
+	// Arms
+	context.moveTo(data.x+width/2, data.y+width);
+	context.lineTo(data.x, data.y+width+width+length_seg/2 );
+	context.moveTo(data.x+width/2, data.y+width);
+        context.lineTo(data.x+width, data.y+width+width+length_seg/2);
+	// Legs
+	context.moveTo(data.x+width/2, data.y+width+length_seg*2);
+        context.lineTo(data.x, data.y+width+length_seg*3);
+        context.moveTo(data.x+width/2, data.y+width+length_seg*2);
+        context.lineTo(data.x+width, data.y+width+length_seg*3);
+	context.stroke();
+}
+
 
 function draw_map(context, data)
 {
