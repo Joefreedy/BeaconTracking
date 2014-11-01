@@ -2,42 +2,19 @@
 <html lang="en">
     <head>
         <title>Tracker Application</title>
-	<script type="text/javascript" src="room_layout.js"></script>
 	<script type="text/javascript" src="staff_draw.js"></script>
         <script type="text/javascript" src="/socket.io/socket.io.js"></script>
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 	<script type="text/javascript">
-	    var canvas_map     = null;
-	    var canvas_beacons = null;
-	    var canvas_staff   = null;
-            var context_map    = null;
-	    var context_beacons= null;
-	    var context_staff  = null;
 	    var socket = null;
-	    var sensors = {}; // Sensor Info
             function on_load()
             {
 		// Setup canvases for multiple layers
-		canvas_map  = document.getElementById('canvas_map');
-		context_map = canvas_map.getContext('2d');
-		canvas_beacons  = document.getElementById('canvas_beacons');
-                context_beacons = canvas_beacons.getContext('2d');
-		canvas_staff  = document.getElementById('canvas_staff');
-                context_staff = canvas_staff.getContext('2d');
+		track_map.init(document);
 		socket = io.connect("/");
             	/*Initializing the connection with the server via websockets */
             	socket.on("message",function(message) {
-                	parsed_message = JSON.parse(message);
-			console.log(parsed_message);
-			if (parsed_message.type=='map') 
-			{
-				// Draw map
-				draw_map(context_map, parsed_message);
-			}
-			else if (parsed_message.type=='track')
-			{
-				staff_draw_staff(context_staff, parsed_message);
-			}
+			track_map.draw(message);
             	});
 	    }
 
@@ -53,8 +30,6 @@
 	 <h1 style="color:blue;text-align:center;">
 		Tracking Application
 	 </h1>
-	 <canvas id="canvas_map"     width="640" height="480" style="position: absolute; z-index: 0"></canvas>
-	 <canvas id="canvas_beacons" width="640" height="480" style="position: absolute; z-index: 1"></canvas>
-	 <canvas id="canvas_staff" width="640" height="480" style="position: absolute; z-index: 2"></canvas>
+	 <div id="track_map" style="width:640;height:480;"></div>
     </body>
 </html>
