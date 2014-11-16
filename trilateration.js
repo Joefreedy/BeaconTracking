@@ -57,6 +57,16 @@ trilateration.dot=function(vector1, vector2)
         return vector1.x * vector2.x + vector1.y * vector2.y;
 }
 
+trilateration.rssi=function(prop_constant, range, tx_power)
+{
+	return -10*prop_constant*log(range) + tx_power;	
+}
+
+trilateration.range_from_rssi=function(rssi, prop_constant, tx_power)
+{
+	return exp( (rssi - tx_power )*log(10)/(-10*prop_constant));
+}
+
 trilateration.calc=function(result1, result2, point1, range1, point2, range2, point3, range3, maxzero)
 {
 	var ex = new vector_2d(0,0);
