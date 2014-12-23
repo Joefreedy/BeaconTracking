@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tracker Application</title>
+    <script type="text/javascript" src="staff_draw.js"></script>
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        var socket = null;
+        function on_load()
+        {
+        	// Setup canvases for multiple layers
+        	//track_map.init(document);
+        	socket = io.connect("/");
+            /*Initializing the connection with the server via websockets */
+            socket.on("message",function(message) {
+            	//track_map.draw(message);
+				updateData(message);
+            });
+        }
+
+        function on_unload()
+        {
+        	console.log("Disconnect");
+        	if (socket != null) socket.disconnect();
+        }
+
+		function updateData(message)
+		{
+			console.log("Update Message");
+			data =  JSON.parse(message);
+			if (data.type != "track")
+			{
+				return;
+			}
+			console.log(data);
+			var staff_list = data.list;
+			console.log( data.list);
+
+			// Loop through list
+			for (var i = 0; i < staff_list.length; i++)
+			{
+				var staff = staff_list[i];
+				var rowNum = table_search('trackingTableData', data.uuid); 
+				if ( rowNum == -1)
+				{
+					add_table_row('trackingTableData', data.id,  staff);
+				} else {
+					//update_table_row('trackingTableData', data, rowNum)
+				}
+			}
+		}
+
+		function table_search(tableDataID, searchTerm)
+		{
+            // Get table info
+            Rows = document.getElementById(tableDataID).getElementsByTagName('TR');
+            RowsLength = Rows.length;
+            RowsText = [];
+			console.log(Rows.length);
+            // Loop through rows
+            for (var i = 0; i < RowsLength; i++) {
+				var row= Rows[i];
+				var colCount = row.cells.length;
+				if (colCount > 0) {
+					var colNum = 0;
+					var cell = row.cells[colNum];
+					console.log(cell.firstChild.nodeValue);
+					var text = cell.firstChild.nodeValue.toUpperCase();
+					RowsText[i]=text;
+				}
+            }
+            
+            // Find  row
+            for (var i = 0, row; row = Rows[i], rowText = RowsText[i]; i++) {
+                if (rowText.indexOf(searchTerm) != -1)
+				{
+					console.log("Found");
+					console.log(i);
+					return i;
+				}
+            }
+			return -1;
+        }
+
+		function add_table_row(tableID, id, data) 
+		{
+			var table = document.getElementById(tableID);
+			var rowCount = table.rows.length;
+			var row = table.insertRow(rowCount);
+			var colCount = table.rows[0].cells.length;
+
+			if (colCount >= 5) 
+			{
+				var cell = row.insertCell(0);
+                var text = document.createTextNode(data.uuid);
+                cell.appendChild(text);
+				var cell = row.insertCell(1);
+                var text = document.createTextNode(data.major);
+                cell.appendChild(text);
+				var cell = row.insertCell(2);
+                var text = document.createTextNode(id);
+                cell.appendChild(text);
+				var cell = row.insertCell(3);
+                var text = document.createTextNode(data.power);
+                cell.appendChild(text);
+				var cell = row.insertCell(4);
+                var text = document.createTextNode(data.rssi);
+                cell.appendChild(text);
+			}
+		}
+
+		function update_table_row(tableID, data, rowNum) 
+        {
+            var table = document.getElementById(tableID);
+            var rowCount = table.rows.length;
+            var row = table.insertRow(rowCount);
+            var colCount = table.rows[0].cells.length;
+
+            if (colCount >= 5) 
+            {
+                var cell = row.insertCell(0);
+                var text = document.createTextNode(data.uuid);
+                cell.appendChild(text);
+                var cell = row.insertCell(1);
+                var text = document.createTextNode(data.major);
+                cell.appendChild(text);
+                var cell = row.insertCell(2);
+                var text = document.createTextNode(data.minor);
+                cell.appendChild(text);
+                var cell = row.insertCell(3);
+                var text = document.createTextNode(data.power);
+                cell.appendChild(text);
+                var cell = row.insertCell(4);
+                var text = document.createTextNode(data.rssi);
+                cell.appendChild(text);
+            }
+        }
+
+	</script>
+</head>
+<body onload="on_load()" onunload="on_unload()">
+<input value="Add Row" onclick="addRow('trackingTable')" type="button">
+<input value="Search" onclick="table_search('trackingTableData', 'text')" type="button">
+<table id="trackingTable" border="1" style="width:100%">
+	<tr>
+    	<th>BLE MAC Address</th>
+    	<th>Sensor Device</th>		
+		<th>Location</th>
+    	<th>RSSI</th>
+		<th>Time</th>
+  	</tr>
+	<tbody id="trackingTableData">
+  		<tr>
+    		<td>12:12:12:12:12</td>
+    		<td>11:11:11:11:11</td>		
+    		<td>Factory Floor A</td>
+			<td>-12dB</td>
+			<td>12:34</td>
+  		</tr>
+	</tbody>
+</table>
+
+</body>
+</html>
